@@ -110,7 +110,7 @@ function muteSpam () {
 function muteBots () {
 	mutesTotal++;
 	engine.chat(responseA);
-	returnMessage = "/mute "+id+" 999y";
+	returnMessage = "/mute "+id+" 9999d";
 	engine.chat(returnMessage);		
 }
 // -------------
