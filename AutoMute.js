@@ -136,7 +136,7 @@ engine.on('msg', function(data) {
 	id = data.steamid;					
 	idS = id.toString();
 	updateResponse();
- 	if (takingCommands&&command)    commandi();			
+ 	if (takingCommands&&command&&(role=="user"))    commandi();			
 	if (steam64&&(role=="user")) 	steam64i();		
 	if (spam&&(role=="user"))		spami();	
 	if (offensive&&(role=="user")) 	offensivei();
