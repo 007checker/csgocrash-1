@@ -3,10 +3,10 @@
 // CREATED BY FREEDOM - 100% FREE SCRIPTS
 
 // ============== TURN ON / OFF =================== 
-var steam64 = true; 	// Check for steam64 			(true = on, false = off)
+var steam64 = true; 	// Check for steam64 		(true = on, false = off)
 var offensive = true;   // Check for offensive language (true = on, false = off)
-var spam = true; 	// Check for spam 				(true = on, false = off)
-var command = true;     // Commands on/off				(true = on, false = off)
+var spam = true; 	// Check for spam 		(true = on, false = off)
+var command = true;     // Commands on/off		(true = on, false = off)
 var antiBots = true;    // Permanent mute for people posting ceratin stuff
 // ================================================
 
@@ -40,7 +40,7 @@ var spamB = "m"; 		 // (m = minutes, h = hours, d = days, y = years)
 // ============= Anti Bots settings =============================
 // Permanent mute
 var advertising = ["csgohill.com","csgo500.com","csgodouble.com","csgopolygon.com"];
-var responseA  = "Advertising leads to a permanent mute without warning";
+var responseA  = "<Automated> Advertising leads to a permanent mute without warning";
 // ==============================================================
 
 
@@ -48,7 +48,8 @@ var responseA  = "Advertising leads to a permanent mute without warning";
 							 
 // ============= Command settings =============================
 // Do not forget to add a response for every command.
-
+var commandMessage = "<Automated> You can type !commands to get a list of commands."
+var commandMessageInterval = 150000; // 1000 = 1 second
 /*
 "mutesTotal" equals all people that have been muted since running the script, restarting resets the counter.
 "nickname" equals the message owners name.
@@ -80,19 +81,19 @@ var mutesTotal = 0;
 var spamCount = 0;
 var numbers = "0123456789";
 updateResponse();
-
+setTimeout(function(){ engine.chat(commandMessage) }, commandMessageInterval);
 // mutes-------
 function muteSteam64() {
 	mutesTotal++;
-	returnMessage = "Steam64 detected - "+nickname+", posting your ID is prohibited";
+	returnMessage = "<Automated> Steam64 detected - "+nickname+", posting your ID is prohibited";
 	engine.chat(returnMessage);
 	returnMessage = "/mute "+id+" "+steam64Duration+steam64B;
 	engine.chat(returnMessage);
 }
 function muteOffensive(x) {
 	mutesTotal++;
-	if (x==1) returnMessage = "Profanity detected - "+nickname+", do not use rude/offensive words";
-	else returnMessage = "Multiple profanity detected - "+nickname+", multiple mutes delivered";
+	if (x==1) returnMessage = "<Automated> Profanity detected - "+nickname+", do not use rude/offensive words";
+	else returnMessage = "<Automated> Multiple profanity detected - "+nickname+", multiple mutes delivered";
 	if (stack) x = x*languageDuration;
 	else x = languageDuration;
 	engine.chat(returnMessage);
@@ -101,7 +102,7 @@ function muteOffensive(x) {
 }
 function muteSpam () {
 	mutesTotal++;
-	returnMessage = "Spam detected - "+nickname+", try to speak in one sentence";
+	returnMessage = "<Automated> Spam detected - "+nickname+", try to speak in one sentence";
 	engine.chat(returnMessage);
 	returnMessage = "/mute "+id+" "+spamDuration+spamB;
 	engine.chat(returnMessage);		
@@ -135,7 +136,7 @@ engine.on('msg', function(data) {
 	id = data.steamid;					
 	idS = id.toString();
 	updateResponse();
- 	if (takingCommands&&command&&(role=="user"))    commandi(message);			
+ 	if (takingCommands&&command)    commandi();			
 	if (steam64&&(role=="user")) 	steam64i();		
 	if (spam&&(role=="user"))		spami();	
 	if (offensive&&(role=="user")) 	offensivei();
