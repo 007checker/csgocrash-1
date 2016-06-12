@@ -5,9 +5,9 @@
 // ============== TURN ON / OFF =================== 
 var steam64 = true; 	// Check for steam64 			(true = on, false = off)
 var offensive = true;   // Check for offensive language (true = on, false = off)
-var spam = true; 		// Check for spam 				(true = on, false = off)
+var spam = true; 	// Check for spam 				(true = on, false = off)
 var command = true;     // Commands on/off				(true = on, false = off)
-var antiBots = true;   // Permanent mute for people posting ceratin stuff
+var antiBots = true;    // Permanent mute for people posting ceratin stuff
 // ================================================
 
 
@@ -30,12 +30,12 @@ var profanity = ["nigga", "nigger","rigged","scam site"];
 // ============= Spam settings =============================
 var spamDuration = 45;		 // Spam ban duration.
 var messagesMax = 5;   		 // Amount of messages within an interval to be counted as spam
-var spamB = "m"; 		 	 // (m = minutes, h = hours, d = days, y = years)
+var spamB = "m"; 		 // (m = minutes, h = hours, d = days, y = years)
 
 // NOT IMPLEMENTED YET
 //var notSpam = 1000;        // Everytime someone types something his "counter" goes up by one. Everytime the code hits this interval, his counter goes down by one
-							 // Meaning that if he types too much too fast he gets muted.
-							 // Milli, 1000 = 1 second	
+			 // Meaning that if he types too much too fast he gets muted.
+			 // Milli, 1000 = 1 second	
 
 // ============= Anti Bots settings =============================
 // Permanent mute
@@ -129,7 +129,7 @@ function stitchMe() {
 
 engine.on('msg', function(data) {
 	role = data.role;
-    nickname = data.nickname;  			
+	nickname = data.nickname;  			
 	message = data.message;
 	message = message.toLowerCase();
 	id = data.steamid;					
@@ -137,8 +137,8 @@ engine.on('msg', function(data) {
 	updateResponse();
  	if (takingCommands&&command&&(role=="user"))    commandi(message);			
 	if (steam64&&(role=="user")) 	steam64i();		
-    if (spam&&(role=="user"))		spami();	
-    if (offensive&&(role=="user")) 	offensivei();
+	if (spam&&(role=="user"))		spami();	
+	if (offensive&&(role=="user")) 	offensivei();
 	if (antiBots&&(role=="user")) 	antiBotsi();
 });
 function commandi() {
