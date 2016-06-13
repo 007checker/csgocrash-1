@@ -33,7 +33,7 @@ var messagesMax = 5;   		 // Amount of messages within an interval to be counted
 var spamB = "m"; 		 // (m = minutes, h = hours, d = days, y = years)
 
 // NOT IMPLEMENTED YET
-//var notSpam = 1000;        // Everytime someone types something his "counter" goes up by one. Everytime the code hits this interval, his counter goes down by one
+//var notSpam = 1000;    // Everytime someone types something his "counter" goes up by one. Everytime the code hits this interval, his counter goes down by one
 			 // Meaning that if he types too much too fast he gets muted.
 			 // Milli, 1000 = 1 second	
 
@@ -49,7 +49,8 @@ var responseA  = "<Automated> Advertising leads to a permanent mute without warn
 // ============= Command settings =============================
 // Do not forget to add a response for every command.
 var commandMessage = "<Automated> You can type !commands to get a list of commands."
-var commandMessageInterval = 150000; // 1000 = 1 second
+var commandMessageInterval = 100; // How many crashes untill next post
+var commandTimeout = 3000; // Interval between accepting commands. 1000 = 1 second
 /*
 "mutesTotal" equals all people that have been muted since running the script, restarting resets the counter.
 "nickname" equals the message owners name.
@@ -72,17 +73,14 @@ response = [
 
 
 
-
-
 // No touchy touchy beyond this line (unless you know what youre doin)
 var nickname, message, id, idS, returnMessage, spamLastID, role, debug, response;
 var takingCommands = true;
 var mutesTotal = 0;
 var spamCount = 0;
+var commandCount = 0;
 var numbers = "0123456789";
 updateResponse();
-setTimeout(function(){ engine.chat(commandMessage) }, commandMessageInterval);
-// mutes-------
 function muteSteam64() {
 	mutesTotal++;
 	returnMessage = "<Automated> Steam64 detected - "+nickname+", posting your ID is prohibited";
@@ -113,9 +111,64 @@ function muteBots () {
 	returnMessage = "/mute "+id+" 9999d";
 	engine.chat(returnMessage);		
 }
-// -------------
+engine.on('game_crash', function(data) {
+    if (commandCount==commandMessageInterval) {
+		engine.chat(commandMessage);
+		commandCount = 0;
+	}
+	else {
+		commandCount++;
+	}
+});
+engine.on('msg', function(data) {
+	role = data.role;
+	nickname = data.nickname;  			
+	message = data.message;
+	message = message.toLowerCase();
+	id = data.steamid;					
+	idS = id.toString();
+	updateResponse();
+ 	if (takingCommands&&command)    commandi();			
+	if (steam64&&(role=="user")) 	user64i();		
+	if (spam&&(role=="user"))		spami();	
+	if (offensive&&(role=="user")) 	offensivei();
+	if (antiBots&&(role=="user")) 	antiBotsi();
+});
+function commandi() {
+	takingCommands = false;
+	for (var i = 0; i<commands.length; i++) {
+		if (message.substring(0, commands[i].length)==commands[i]) {
+			engine.chat(response[i]);
+			break;
+		}		
+	}
+	setTimeout(function(){ takingCommands = true; }, commandTimeout);
+}
+function user64i() {
+	for (var i = 0; i < message.length+1-id.length; i++) {
+		if (message.substring(i,(i+id.length))==id) {
+			if (message.substring((i-5),i)=="user/") {
+			console.log('Profile');
+			break;
+			}
+			else {
+			console.log('No Profile');
+			steam64i();
+			break;				
+			}
 
-
+		}                      
+	}
+}
+function steam64i() {
+	var stichedMessage = stitchMe();
+	for (var i = 0; i < stichedMessage.length+1-id.length; i++) {
+		if (stichedMessage.substring(i,(i+id.length))==id) {
+			muteSteam64();
+			break;				
+		}                      
+	}
+}
 function stitchMe() {
 	var rM = "";
 	for (var i = 0; i<message.length; i++) {
@@ -127,46 +180,6 @@ function stitchMe() {
 	}
 	return rM;
 }
-
-engine.on('msg', function(data) {
-	role = data.role;
-	nickname = data.nickname;  			
-	message = data.message;
-	message = message.toLowerCase();
-	id = data.steamid;					
-	idS = id.toString();
-	updateResponse();
- 	if (takingCommands&&command&&(role=="user"))    commandi();			
-	if (steam64&&(role=="user")) 	steam64i();		
-	if (spam&&(role=="user"))		spami();	
-	if (offensive&&(role=="user")) 	offensivei();
-	if (antiBots&&(role=="user")) 	antiBotsi();
-});
-function commandi() {
-	takingCommands = false;
-	looptroop:
-	for (var i = 0; i<commands.length; i++) {
-		for (var k = 0; k<message.length+1-commands[i].length; k++) {
-			if (message.substring(k, k+commands[i].length)==commands[i]) {
-				engine.chat(response[i]);
-				break looptroop;
-			}		
-		}
-	}
-	setTimeout(function(){ takingCommands = true; }, 3000);
-}
-
-function steam64i() {
-	var stichedMessage = stitchMe();
-	loopi:
-	for (var i = 0; i < stichedMessage.length+1-id.length; i++) {
-		if (stichedMessage.substring(i,(i+id.length))==id) {
-			muteSteam64();
-			break;				
-		}                      
-	}
-}
-
 function offensivei() {
 	var totalen = 0;
 	for (var i = 0; i<profanity.length; i++) {
