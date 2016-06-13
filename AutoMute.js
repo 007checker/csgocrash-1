@@ -5,7 +5,7 @@
 // ============== TURN ON / OFF =================== 
 var steam64 = true; 	// Check for steam64 		(true = on, false = off)
 var offensive = true;   // Check for offensive language (true = on, false = off)
-var spam = true; 	// Check for spam 		(true = on, false = off)
+var spam = true; 		// Check for spam 		(true = on, false = off)
 var command = true;     // Commands on/off		(true = on, false = off)
 var antiBots = true;    // Permanent mute for people posting ceratin stuff
 // ================================================
@@ -18,7 +18,7 @@ var steam64B = "h"; 		 // (m = minutes, h = hours, d = days, y = years)
 // ============= Profanity settings =============================
 /*
 Stacking now results in a multiplication of one mute instead of several small mutes
-Example: "RIGGED RIGGED RIGGED" would now yield a 90 minute ban and not 3 bans á 30min.
+Example: "RIGGED RIGGED RIGGED" would now yield a 90 minute ban and not 3 bans ? 30min.
 Turning stacking off now only mutes once, the first profanity that is detected
 */
 var languageDuration = 30; 	 // Offensive language ban duration.
@@ -33,7 +33,7 @@ var messagesMax = 5;   		 // Amount of messages within an interval to be counted
 var spamB = "m"; 		 // (m = minutes, h = hours, d = days, y = years)
 
 // NOT IMPLEMENTED YET
-//var notSpam = 1000;    // Everytime someone types something his "counter" goes up by one. Everytime the code hits this interval, his counter goes down by one
+//var notSpam = 1000;        // Everytime someone types something his "counter" goes up by one. Everytime the code hits this interval, his counter goes down by one
 			 // Meaning that if he types too much too fast he gets muted.
 			 // Milli, 1000 = 1 second	
 
@@ -129,7 +129,7 @@ engine.on('msg', function(data) {
 	idS = id.toString();
 	updateResponse();
  	if (takingCommands&&command)    commandi();			
-	if (steam64&&(role=="user")) 	user64i();		
+	if (steam64&&(role=="user")) 	user64i(message);		
 	if (spam&&(role=="user"))		spami();	
 	if (offensive&&(role=="user")) 	offensivei();
 	if (antiBots&&(role=="user")) 	antiBotsi();
@@ -144,24 +144,27 @@ function commandi() {
 	}
 	setTimeout(function(){ takingCommands = true; }, commandTimeout);
 }
-function user64i() {
-	for (var i = 0; i < message.length+1-id.length; i++) {
-		if (message.substring(i,(i+id.length))==id) {
-			if (message.substring((i-5),i)=="user/") {
+function user64i(messageOriginal) {
+	var toTheStitch = messageOriginal;
+	var isUserProfile = true;
+	for (var i = 0; i < messageOriginal.length+1-id.length; i++) {
+		if (messageOriginal.substring(i,(i+id.length))==id) {
+			if (messageOriginal.substring((i-5),i)=="user/") {
 			console.log('Profile');
+			isUserProfile = false;
 			break;
 			}
 			else {
 			console.log('No Profile');
-			steam64i();
 			break;				
 			}
 
 		}                      
 	}
+	if (isUserProfile) steam64i(toTheStitch);
 }
-function steam64i() {
-	var stichedMessage = stitchMe();
+function steam64i(unstitched) {
+	var stichedMessage = stitchMe(unstitched);
 	for (var i = 0; i < stichedMessage.length+1-id.length; i++) {
 		if (stichedMessage.substring(i,(i+id.length))==id) {
 			muteSteam64();
@@ -169,15 +172,16 @@ function steam64i() {
 		}                      
 	}
 }
-function stitchMe() {
+function stitchMe(stillUnstitched) {
 	var rM = "";
-	for (var i = 0; i<message.length; i++) {
+	for (var i = 0; i<stillUnstitched.length; i++) {
 		for (var ii = 0; ii<numbers.length; ii++) {
-			if (message.charAt(i)==numbers[ii])
-				rM = rM+message.charAt(i);
+			if (stillUnstitched.charAt(i)==numbers[ii])
+				rM = rM+stillUnstitched.charAt(i);
 		}
 		
 	}
+	console.log(rM);
 	return rM;
 }
 function offensivei() {
