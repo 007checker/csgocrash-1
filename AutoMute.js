@@ -138,6 +138,7 @@ function commandi() {
 	takingCommands = false;
 	for (var i = 0; i<commands.length; i++) {
 		if (message.substring(0, commands[i].length)==commands[i]) {
+			spamCount -= 1;
 			engine.chat(response[i]);
 			break;
 		}		
